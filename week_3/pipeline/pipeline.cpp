@@ -64,12 +64,13 @@ public:
 
     void Run() override
     {
-        while (!in_.eof())
+        while (in_)
         {
             auto email = make_unique<Email>();
             getline(in_, email->from);
             getline(in_, email->to);
             getline(in_, email->body);
+            if (in_.eof()) break;
 
             PassOn(move(email));
         }
