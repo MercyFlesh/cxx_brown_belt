@@ -10,6 +10,10 @@ using namespace std;
 
 constexpr int DAY_SEC = 86'400;
 
+namespace {
+    static const int SECONDS_IN_DAY = 60 * 60 * 24;
+}
+
 class Date
 {
 public:
@@ -47,32 +51,32 @@ public:
 
     void earn(const Date& from, const Date& to, int sum)
     {
-        size_t days_count = daysCount(from, to);
+        size_t days_count = daysCount(from, to) + 1;
         double profit_for_day = static_cast<double>(sum) / days_count;
         
         time_t begin = from.AsTimestamp();
         for (size_t i = 0; i < days_count; ++i)
-            profit[begin + (i * DAY_SEC)] += profit_for_day;
+            profit[begin + i * DAY_SEC] += profit_for_day;
     }
 
     double compute_income(const Date& from, const Date& to)
     {
         double compute_profit = 0;
 
-        size_t days_count = daysCount(from, to);
+        size_t days_count = daysCount(from, to) + 1;
         time_t begin = from.AsTimestamp();
-        for (size_t i = 0; i < days_count + 1; ++i)
-            compute_profit += profit[begin + (i * DAY_SEC)];
+        for (int i = 0; i < days_count; ++i)
+            compute_profit += profit[begin + i * DAY_SEC];
 
         return compute_profit;
     }
 
     void pay_tax(const Date& from, const Date& to)
     {
-        size_t days_count = daysCount(from, to);
+        size_t days_count = daysCount(from, to) + 1;
         time_t begin = from.AsTimestamp();
-        for (size_t i = 0; i < days_count + 1; ++i)
-            profit[begin + (i * DAY_SEC)] *= 0.87;
+        for (size_t i = 0; i < days_count; ++i)
+            profit[begin + i * DAY_SEC] *= 0.87;
     }
 
 private:
@@ -87,7 +91,7 @@ istream& operator >> (istream& is, Date& date)
     stringstream date_stream(move(str_date));
     
     date_stream >> date.year_;
-    date_stream.ignore();
+    date_stream.ignore(1);
     date_stream >> date.month_;
     date_stream.ignore();
     date_stream >> date.day_;
